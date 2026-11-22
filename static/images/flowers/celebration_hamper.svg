@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="chbg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF2F2"/>
+      <stop offset="100%" stop-color="#FEE2E2"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#chbg)" rx="12"/>
+  <!-- Basket -->
+  <path d="M140 240 L160 170 L240 170 L260 240 Z" fill="#B45309"/>
+  <circle cx="180" cy="140" r="30" fill="#DC2626"/>
+  <circle cx="220" cy="140" r="30" fill="#E11D48"/>
+  <circle cx="200" cy="100" r="32" fill="#EAB308"/>
+  <text x="200" y="280" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="bold" fill="#991B1B" text-anchor="middle" letter-spacing="1">CELEBRATION HAMPER</text>
+</svg>

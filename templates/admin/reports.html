@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}Reports & Analytics - Admin | Floral Bliss{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+      <span class="badge bg-danger-subtle text-danger px-3 py-1 rounded-pill fw-semibold border mb-1">Business Intelligence</span>
+      <h2 class="display-6 fw-bold mb-0">Management Reports</h2>
+    </div>
+    <div class="d-flex gap-2">
+      <button onclick="window.print()" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+        <i class="bi bi-printer me-1"></i> Print Reports
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <ul class="nav nav-pills mb-4 bg-white p-2 rounded-4 shadow-sm border" id="reportsTab" role="tablist">
+    <li class="nav-item flex-fill text-center">
+      <button class="nav-link active fw-bold py-2" id="sales-tab" data-bs-toggle="pill" data-bs-target="#sales-report" type="button" role="tab">
+        <i class="bi bi-cash-stack me-1"></i> 1. Sales Report
+      </button>
+    </li>
+    <li class="nav-item flex-fill text-center">
+      <button class="nav-link fw-bold py-2" id="inventory-tab" data-bs-toggle="pill" data-bs-target="#inventory-report" type="button" role="tab">
+        <i class="bi bi-flower2 me-1"></i> 2. Inventory Valuation Report
+      </button>
+    </li>
+    <li class="nav-item flex-fill text-center">
+      <button class="nav-link fw-bold py-2" id="delivery-tab" data-bs-toggle="pill" data-bs-target="#delivery-report" type="button" role="tab">
+        <i class="bi bi-truck me-1"></i> 3. Delivery Performance Report
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="reportsTabContent">
+    
+    <!-- 1. Sales Report Tab -->
+    <div class="tab-pane fade show active" id="sales-report" role="tabpanel">
+      <!-- Metric Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white border-start border-4 border-success">
+            <span class="text-muted small text-uppercase fw-semibold">Net Confirmed Sales</span>
+            <h3 class="fw-bold my-1 text-success">₹{{ "%.2f"|format(total_sales) }}</h3>
+            <small class="text-muted">Total cleared transactions from customers</small>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white border-start border-4 border-primary">
+            <span class="text-muted small text-uppercase fw-semibold">Total Orders Processed</span>
+            <h3 class="fw-bold my-1 text-dark">{{ sales|length }} Orders</h3>
+            <small class="text-muted">Across online and COD channels</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+        <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold m-0" style="color: var(--primary-sage-dark);">Detailed Sales Transactions</h5>
+          <a href="{{ url_for('export_report_csv', report_type='sales') }}" class="btn btn-sm btn-outline-success rounded-pill px-3">
+            <i class="bi bi-download me-1"></i> Export Sales CSV
+          </a>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="ps-4">Order ID</th>
+                <th scope="col">Date & Time</th>
+                <th scope="col">Customer</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Payment Method</th>
+                <th scope="col">Payment Status</th>
+                <th scope="col" class="pe-4">Order Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in sales %}
+              <tr>
+                <td class="ps-4 fw-bold">#{{ s.order_id }}</td>
+                <td class="small">{{ s.order_date }}</td>
+                <td class="fw-semibold">{{ s.customer_name }}</td>
+                <td class="fw-bold">₹{{ "%.2f"|format(s.total_amount) }}</td>
+                <td>{{ s.method or 'N/A' }}</td>
+                <td>
+                  <span class="badge {% if s.pay_status == 'Paid' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                    {{ s.pay_status or 'Pending' }}
+                  </span>
+                </td>
+                <td class="pe-4">
+                  <span class="status-pill {{ s.status.lower().replace(' ', '-') }}">{{ s.status }}</span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Inventory Report Tab -->
+    <div class="tab-pane fade" id="inventory-report" role="tabpanel">
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white border-start border-4 border-info">
+            <span class="text-muted small text-uppercase fw-semibold">Total Inventory Asset Value</span>
+            <h3 class="fw-bold my-1 text-info">₹{{ "%.2f"|format(total_inventory_val) }}</h3>
+            <small class="text-muted">Calculated as Σ(Current Stock × Selling Price)</small>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white border-start border-4 border-warning">
+            <span class="text-muted small text-uppercase fw-semibold">Flower Types</span>
+            <h3 class="fw-bold my-1 text-dark">{{ inventory|length }} Listed</h3>
+            <small class="text-muted">Active flowers across categories</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+        <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold m-0" style="color: var(--primary-sage-dark);">Stock & Asset Valuation</h5>
+          <a href="{{ url_for('export_report_csv', report_type='inventory') }}" class="btn btn-sm btn-outline-info rounded-pill px-3">
+            <i class="bi bi-download me-1"></i> Export Inventory CSV
+          </a>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="ps-4">Flower Name</th>
+                <th scope="col">Category</th>
+                <th scope="col">Supplier</th>
+                <th scope="col">Unit Price</th>
+                <th scope="col">Stock Quantity</th>
+                <th scope="col" class="pe-4">Total Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for i in inventory %}
+              <tr>
+                <td class="ps-4 fw-bold text-dark">{{ i.name }}</td>
+                <td>{{ i.category_name }}</td>
+                <td class="small text-muted">{{ i.supplier_name }}</td>
+                <td>₹{{ "%.2f"|format(i.price) }}</td>
+                <td>
+                  {% if i.stock_qty <= 0 %}
+                    <span class="badge bg-danger">0 Out of Stock</span>
+                  {% elif i.stock_qty <= 5 %}
+                    <span class="badge bg-warning text-dark">{{ i.stock_qty }} Units (Low)</span>
+                  {% else %}
+                    <span class="badge bg-success">{{ i.stock_qty }} Units</span>
+                  {% endif %}
+                </td>
+                <td class="pe-4 fw-bold">₹{{ "%.2f"|format(i.total_val) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Delivery Performance Report Tab -->
+    <div class="tab-pane fade" id="delivery-report" role="tabpanel">
+      <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+        <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold m-0" style="color: var(--primary-sage-dark);">Delivery Execution Records</h5>
+          <a href="{{ url_for('export_report_csv', report_type='delivery') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+            <i class="bi bi-download me-1"></i> Export Delivery CSV
+          </a>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="ps-4">Delivery ID</th>
+                <th scope="col">Order ID</th>
+                <th scope="col">Customer</th>
+                <th scope="col">Assigned Driver</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="pe-4">Delivered Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for d in deliveries %}
+              <tr>
+                <td class="ps-4 fw-bold">#{{ d.delivery_id }}</td>
+                <td>#{{ d.order_id }}</td>
+                <td>{{ d.customer_name }}</td>
+                <td>{{ d.driver_name or 'Unassigned' }}</td>
+                <td>
+                  <span class="status-pill {{ d.status.lower().replace(' ', '-') }}">{{ d.status }}</span>
+                </td>
+                <td class="pe-4 small text-muted">{{ d.delivered_on or 'In transit' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

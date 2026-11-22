@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="wbg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFBEB"/>
+      <stop offset="100%" stop-color="#FEF3C7"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#wbg)" rx="12"/>
+  <!-- Vase -->
+  <path d="M160 250 L170 180 L230 180 L240 250 Z" fill="#D97706" opacity="0.8"/>
+  <ellipse cx="200" cy="180" rx="30" ry="8" fill="#F59E0B"/>
+  <ellipse cx="200" cy="250" rx="40" ry="10" fill="#B45309"/>
+  <!-- Grand Arrangement -->
+  <circle cx="200" cy="130" r="45" fill="#FDA4AF"/>
+  <circle cx="155" cy="140" r="35" fill="#F43F5E"/>
+  <circle cx="245" cy="140" r="35" fill="#F43F5E"/>
+  <circle cx="200" cy="80" r="30" fill="#FDE047"/>
+  <circle cx="140" cy="100" r="25" fill="#E2E8F0"/>
+  <circle cx="260" cy="100" r="25" fill="#E2E8F0"/>
+  <text x="200" y="280" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="bold" fill="#78350F" text-anchor="middle" letter-spacing="1">GRAND WEDDING ARRANGEMENT</text>
+</svg>

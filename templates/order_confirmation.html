@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmed #{{ order.order_id }} - Floral Bliss{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+  <div class="card border-0 shadow-lg rounded-4 p-5 bg-white mx-auto" style="max-width: 680px;">
+    
+    <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+      <i class="bi bi-check2 fs-1"></i>
+    </div>
+
+    <h2 class="display-6 fw-bold mb-2">Order Confirmed!</h2>
+    <p class="text-muted mb-4">
+      Thank you, <strong>{{ order.customer_name }}</strong>! We have received your order 
+      <span class="badge bg-light text-dark border fs-6">#{{ order.order_id }}</span>. Our florists have been notified and will begin preparing your blooms.
+    </p>
+
+    <!-- Key details card -->
+    <div class="p-3 bg-light rounded-3 text-start mb-4 border">
+      <div class="row g-2 small">
+        <div class="col-6">
+          <span class="text-muted d-block">Order Date:</span>
+          <strong>{{ order.order_date }}</strong>
+        </div>
+        <div class="col-6">
+          <span class="text-muted d-block">Delivery Date:</span>
+          <strong>{{ order.delivery_date or 'Today / Express' }}</strong>
+        </div>
+        <div class="col-6">
+          <span class="text-muted d-block">Payment Method:</span>
+          <strong>{{ order.payment_method }} ({{ order.payment_status }})</strong>
+        </div>
+        <div class="col-6">
+          <span class="text-muted d-block">Total Amount:</span>
+          <strong class="text-success fs-6">₹{{ "%.2f"|format(order.total_amount) }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Items list -->
+    <div class="text-start mb-4">
+      <h6 class="fw-bold mb-3 border-bottom pb-2">Ordered Flowers:</h6>
+      {% for item in items %}
+        <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+          <div class="d-flex align-items-center gap-2">
+            <img src="{{ item.image_url }}" alt="{{ item.name }}" class="rounded border" style="width: 42px; height: 42px; object-fit: cover;">
+            <div>
+              <span class="fw-semibold small d-block">{{ item.name }}</span>
+              <small class="text-muted">{{ item.quantity }} × ₹{{ "%.2f"|format(item.unit_price) }}</small>
+            </div>
+          </div>
+          <span class="fw-bold small">₹{{ "%.2f"|format(item.quantity * item.unit_price) }}</span>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex flex-wrap gap-2 justify-content-center">
+      <a href="{{ url_for('track_order', order_id=order.order_id) }}" class="btn btn-sage px-4 rounded-pill">
+        <i class="bi bi-geo-alt me-1"></i> Track Live Status
+      </a>
+      <a href="{{ url_for('printable_invoice', order_id=order.order_id) }}" target="_blank" class="btn btn-outline-secondary px-4 rounded-pill">
+        <i class="bi bi-printer me-1"></i> Print Invoice
+      </a>
+      <a href="{{ url_for('catalog') }}" class="btn btn-outline-sage px-4 rounded-pill">
+        <i class="bi bi-arrow-left me-1"></i> Back to Catalog
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

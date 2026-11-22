@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}Floral Bliss - Fresh Flowers & Handcrafted Arrangements{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <span class="badge bg-white text-success px-3 py-2 rounded-pill shadow-sm mb-3 border">
+          <i class="bi bi-stars text-warning me-1"></i> Farm Fresh Blooms Daily
+        </span>
+        <h1 class="hero-title mb-4">
+          Fresh Blooms Crafted For Life's <span style="color: var(--rose-accent-dark);">Precious Moments</span>
+        </h1>
+        <p class="hero-subtitle mb-4">
+          Explore artisanal bouquets, velvet roses, and luxury orchids. Handcrafted by master florists with same-day express delivery and live order tracking.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{{ url_for('catalog') }}" class="btn btn-sage btn-lg px-4 rounded-pill shadow-sm">
+            <i class="bi bi-bag-heart me-2"></i> Explore Catalog
+          </a>
+          <a href="{{ url_for('login') }}" class="btn btn-outline-sage btn-lg px-4 rounded-pill">
+            <i class="bi bi-key me-2"></i> Quick Demo Login
+          </a>
+        </div>
+
+        <div class="row g-3 mt-4 pt-3 border-top">
+          <div class="col-4">
+            <h4 class="mb-0 fw-bold" style="color: var(--primary-sage-dark);">{{ stats.flowers }}+</h4>
+            <small class="text-muted">Flower Varieties</small>
+          </div>
+          <div class="col-4">
+            <h4 class="mb-0 fw-bold" style="color: var(--primary-sage-dark);">{{ stats.orders }}+</h4>
+            <small class="text-muted">Orders Fulfilled</small>
+          </div>
+          <div class="col-4">
+            <h4 class="mb-0 fw-bold" style="color: var(--primary-sage-dark);">4.9 ★</h4>
+            <small class="text-muted">Customer Rating</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 text-center position-relative">
+        <div class="card border-0 shadow-lg rounded-4 p-3 bg-white mx-auto" style="max-width: 480px;">
+          <img src="{{ url_for('static', filename='images/flowers/red_roses.svg') }}" class="rounded-3 img-fluid" alt="Signature Bouquet">
+          <div class="card-body text-start p-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <span class="badge bg-danger-subtle text-danger mb-1">Featured Bestseller</span>
+                <h5 class="mb-0 fw-bold">Velvet Red Roses Bouquet</h5>
+              </div>
+              <span class="fs-4 fw-bold" style="color: var(--rose-accent-dark);">₹450</span>
+            </div>
+            <p class="text-muted small mt-2 mb-3">Fresh Ooty roses paired with baby's breath and tied with crimson satin ribbon.</p>
+            <div class="d-flex gap-2">
+              <a href="{{ url_for('flower_detail', flower_id=1) }}" class="btn btn-outline-sage btn-sm flex-grow-1">View Details</a>
+              <form action="{{ url_for('add_to_cart') }}" method="POST" class="flex-grow-1">
+                <input type="hidden" name="flower_id" value="1">
+                <input type="hidden" name="quantity" value="1">
+                <button type="submit" class="btn btn-sage btn-sm w-100">
+                  <i class="bi bi-cart-plus me-1"></i> Add to Cart
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Categories Bar -->
+<section class="py-5 bg-white border-bottom">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="text-uppercase fw-semibold" style="color: var(--primary-sage); letter-spacing: 1px;">Collections</span>
+      <h2 class="display-6 fw-bold">Shop By Category</h2>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+      {% for cat in categories %}
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="{{ url_for('catalog', category=cat.category_id) }}" class="text-decoration-none">
+          <div class="card h-100 text-center border p-3 rounded-4 shadow-sm hover-shadow transition">
+            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 58px; height: 58px;">
+              {% if cat.category_name == 'Roses' %}
+                <span class="fs-3">🌹</span>
+              {% elif cat.category_name == 'Orchids' %}
+                <span class="fs-3">🪻</span>
+              {% elif cat.category_name == 'Bouquets' %}
+                <span class="fs-3">💐</span>
+              {% elif cat.category_name == 'Event Arrangements' %}
+                <span class="fs-3">🌺</span>
+              {% else %}
+                <span class="fs-3">🌸</span>
+              {% endif %}
+            </div>
+            <h6 class="fw-bold mb-1 text-dark">{{ cat.category_name }}</h6>
+            <small class="text-muted" style="font-size: 0.75rem;">Explore &rarr;</small>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Featured Flowers Catalog Grid -->
+<section class="py-5" style="background-color: var(--sage-bg-light);">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <span class="text-uppercase fw-semibold" style="color: var(--primary-sage); letter-spacing: 1px;">Fresh Arrivals</span>
+        <h2 class="display-6 fw-bold mb-0">Handpicked Blossoms</h2>
+      </div>
+      <a href="{{ url_for('catalog') }}" class="btn btn-outline-sage rounded-pill px-4">
+        View Entire Catalog (12) <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row g-4">
+      {% for flower in featured_flowers %}
+      <div class="col-12 col-sm-6 col-md-4">
+        <div class="flower-card">
+          <div class="flower-img-wrapper">
+            <img src="{{ flower.image_url }}" alt="{{ flower.name }}">
+            <div class="flower-badge-overlay">
+              {% if flower.stock_qty <= 0 %}
+                <span class="badge-stock out-of-stock">Out of Stock</span>
+              {% elif flower.stock_qty <= 5 %}
+                <span class="badge-stock low-stock">Only {{ flower.stock_qty }} Left!</span>
+              {% else %}
+                <span class="badge-stock in-stock">In Stock ({{ flower.stock_qty }})</span>
+              {% endif %}
+              <span class="badge bg-white text-dark shadow-sm">{{ flower.color }}</span>
+            </div>
+          </div>
+          <div class="flower-details">
+            <span class="flower-category">{{ flower.category_name or 'Floral' }}</span>
+            <h5 class="flower-name">{{ flower.name }}</h5>
+            
+            <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
+              <span class="flower-price">₹{{ "%.2f"|format(flower.price) }}</span>
+              <div class="d-flex gap-2">
+                <a href="{{ url_for('flower_detail', flower_id=flower.flower_id) }}" class="btn btn-sm btn-outline-secondary" title="View details">
+                  <i class="bi bi-eye"></i>
+                </a>
+                {% if flower.stock_qty > 0 %}
+                  <form action="{{ url_for('add_to_cart') }}" method="POST">
+                    <input type="hidden" name="flower_id" value="{{ flower.flower_id }}">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn btn-sm btn-sage">
+                      <i class="bi bi-cart-plus"></i> Add
+                    </button>
+                  </form>
+                {% else %}
+                  <button class="btn btn-sm btn-secondary" disabled>Sold Out</button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose Us & Workflow Section -->
+<section class="py-5 bg-white border-top">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="text-uppercase fw-semibold" style="color: var(--primary-sage);">Seamless Experience</span>
+      <h2 class="display-6 fw-bold">Why Flower Lovers Choose Us</h2>
+    </div>
+
+    <div class="row g-4 text-center">
+      <div class="col-md-3">
+        <div class="p-3">
+          <div class="fs-1 text-success mb-3"><i class="bi bi-flower2"></i></div>
+          <h5 class="fw-bold">100% Farm Fresh</h5>
+          <p class="text-muted small">Harvested daily from premium floriculture farms in Ooty, Pune, and Dehradun.</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="p-3">
+          <div class="fs-1 text-danger mb-3"><i class="bi bi-scissors"></i></div>
+          <h5 class="fw-bold">Master Florist Hand-tied</h5>
+          <p class="text-muted small">Every bouquet is individually prepared by trained artisans for your occasion.</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="p-3">
+          <div class="fs-1 text-primary mb-3"><i class="bi bi-truck"></i></div>
+          <h5 class="fw-bold">Live Status Tracking</h5>
+          <p class="text-muted small">Watch your order transition from Preparation to Out for Delivery in real-time.</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="p-3">
+          <div class="fs-1 text-warning mb-3"><i class="bi bi-shield-check"></i></div>
+          <h5 class="fw-bold">Secure Online / COD</h5>
+          <p class="text-muted small">Pay via Razorpay/PayPal mock cards, UPI, or select Cash on Delivery.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Flowers - Admin Console | Floral Bliss{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+      <span class="badge bg-danger-subtle text-danger px-3 py-1 rounded-pill fw-semibold border mb-1">
+        Inventory Management
+      </span>
+      <h2 class="display-6 fw-bold mb-0">Flower Catalog Management</h2>
+    </div>
+    <button class="btn btn-sage rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#addFlowerModal">
+      <i class="bi bi-plus-lg me-1"></i> Add New Flower
+    </button>
+  </div>
+
+  <!-- Flowers Table -->
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th scope="col" class="ps-4">ID</th>
+            <th scope="col">Flower Name</th>
+            <th scope="col">Category</th>
+            <th scope="col">Supplier</th>
+            <th scope="col">Color</th>
+            <th scope="col">Unit Price</th>
+            <th scope="col">Stock Qty</th>
+            <th scope="col" class="text-end pe-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in flowers %}
+          <tr>
+            <td class="ps-4 fw-bold">#{{ f.flower_id }}</td>
+            <td>
+              <div class="d-flex align-items-center gap-3">
+                <img src="{{ f.image_url }}" alt="{{ f.name }}" class="rounded border" style="width: 44px; height: 44px; object-fit: cover;">
+                <span class="fw-bold text-dark">{{ f.name }}</span>
+              </div>
+            </td>
+            <td><span class="badge bg-light text-dark border">{{ f.category_name or 'Uncategorized' }}</span></td>
+            <td class="small text-muted">{{ f.supplier_name or 'N/A' }}</td>
+            <td>{{ f.color }}</td>
+            <td class="fw-bold">₹{{ "%.2f"|format(f.price) }}</td>
+            <td>
+              {% if f.stock_qty <= 0 %}
+                <span class="badge bg-danger">0 (Out of Stock)</span>
+              {% elif f.stock_qty <= 5 %}
+                <span class="badge bg-warning text-dark">{{ f.stock_qty }} (Low)</span>
+              {% else %}
+                <span class="badge bg-success">{{ f.stock_qty }} in stock</span>
+              {% endif %}
+            </td>
+            <td class="text-end pe-4">
+              <div class="d-inline-flex gap-2">
+                <!-- Edit Button -->
+                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" 
+                        data-bs-toggle="modal" data-bs-target="#editModal{{ f.flower_id }}">
+                  <i class="bi bi-pencil-square"></i> Edit
+                </button>
+                <!-- Delete Button -->
+                <form action="{{ url_for('admin_flowers') }}" method="POST" onsubmit="return confirm('Delete this flower from catalog?');" class="d-inline">
+                  <input type="hidden" name="action" value="delete">
+                  <input type="hidden" name="flower_id" value="{{ f.flower_id }}">
+                  <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Edit Flower Modal -->
+          <div class="modal fade" id="editModal{{ f.flower_id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header border-bottom">
+                  <h5 class="modal-title fw-bold">Edit Flower #{{ f.flower_id }}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ url_for('admin_flowers') }}" method="POST">
+                  <div class="modal-body p-4">
+                    <input type="hidden" name="action" value="edit">
+                    <input type="hidden" name="flower_id" value="{{ f.flower_id }}">
+
+                    <div class="mb-3">
+                      <label class="form-label small fw-semibold">Flower Name *</label>
+                      <input type="text" name="name" class="form-control" value="{{ f.name }}" required>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                      <div class="col-6">
+                        <label class="form-label small fw-semibold">Category</label>
+                        <select name="category_id" class="form-select">
+                          {% for c in categories %}
+                            <option value="{{ c.category_id }}" {% if c.category_id == f.category_id %}selected{% endif %}>{{ c.category_name }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div class="col-6">
+                        <label class="form-label small fw-semibold">Supplier</label>
+                        <select name="supplier_id" class="form-select">
+                          {% for s in suppliers %}
+                            <option value="{{ s.supplier_id }}" {% if s.supplier_id == f.supplier_id %}selected{% endif %}>{{ s.name }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                      <div class="col-4">
+                        <label class="form-label small fw-semibold">Color</label>
+                        <input type="text" name="color" class="form-control" value="{{ f.color }}">
+                      </div>
+                      <div class="col-4">
+                        <label class="form-label small fw-semibold">Price (₹) *</label>
+                        <input type="number" step="0.01" name="price" class="form-control" value="{{ f.price }}" required>
+                      </div>
+                      <div class="col-4">
+                        <label class="form-label small fw-semibold">Stock Qty *</label>
+                        <input type="number" name="stock_qty" class="form-control" value="{{ f.stock_qty }}" required>
+                      </div>
+                    </div>
+
+                    <div class="mb-2">
+                      <label class="form-label small fw-semibold">Image URL or Asset Path</label>
+                      <input type="text" name="image_url" class="form-control" value="{{ f.image_url }}">
+                    </div>
+                  </div>
+                  <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-sage">Save Changes</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Add Flower Modal -->
+<div class="modal fade" id="addFlowerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title fw-bold">Add New Flower to Catalog</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{{ url_for('admin_flowers') }}" method="POST">
+        <div class="modal-body p-4">
+          <input type="hidden" name="action" value="add">
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Flower Name *</label>
+            <input type="text" name="name" class="form-control" placeholder="e.g. Sunset Daisy Bouquet" required>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Category</label>
+              <select name="category_id" class="form-select">
+                {% for c in categories %}
+                  <option value="{{ c.category_id }}">{{ c.category_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Supplier</label>
+              <select name="supplier_id" class="form-select">
+                {% for s in suppliers %}
+                  <option value="{{ s.supplier_id }}">{{ s.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-4">
+              <label class="form-label small fw-semibold">Color</label>
+              <input type="text" name="color" class="form-control" placeholder="Red, Pink...">
+            </div>
+            <div class="col-4">
+              <label class="form-label small fw-semibold">Price (₹) *</label>
+              <input type="number" step="0.01" name="price" class="form-control" placeholder="450.00" required>
+            </div>
+            <div class="col-4">
+              <label class="form-label small fw-semibold">Initial Stock *</label>
+              <input type="number" name="stock_qty" class="form-control" value="20" required>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label small fw-semibold">Image URL / Path</label>
+            <input type="text" name="image_url" class="form-control" value="/static/images/flowers/red_roses.svg">
+          </div>
+        </div>
+        <div class="modal-footer bg-light border-0">
+          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-sage">Add Flower</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="pbg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F3E8FF"/>
+      <stop offset="100%" stop-color="#E9D5FF"/>
+    </linearGradient>
+    <radialGradient id="orchidPetal" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#C084FC"/>
+      <stop offset="60%" stop-color="#9333EA"/>
+      <stop offset="100%" stop-color="#6B21A8"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#pbg)" rx="12"/>
+  <!-- Arching Stem -->
+  <path d="M120 280 Q200 220 230 70" stroke="#3F6212" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <!-- Left Bloom -->
+  <g transform="translate(160, 170)">
+    <ellipse cx="-25" cy="-5" rx="24" ry="16" fill="url(#orchidPetal)" transform="rotate(-25)"/>
+    <ellipse cx="25" cy="-5" rx="24" ry="16" fill="url(#orchidPetal)" transform="rotate(25)"/>
+    <ellipse cx="0" cy="-25" rx="22" ry="18" fill="url(#orchidPetal)"/>
+    <ellipse cx="-15" cy="20" rx="20" ry="15" fill="#7E22CE"/>
+    <ellipse cx="15" cy="20" rx="20" ry="15" fill="#7E22CE"/>
+    <circle cx="0" cy="5" r="8" fill="#FACC15"/>
+    <circle cx="0" cy="5" r="3" fill="#E11D48"/>
+  </g>
+  <!-- Center Main Bloom -->
+  <g transform="translate(210, 110)">
+    <ellipse cx="-30" cy="-5" rx="28" ry="19" fill="url(#orchidPetal)" transform="rotate(-25)"/>
+    <ellipse cx="30" cy="-5" rx="28" ry="19" fill="url(#orchidPetal)" transform="rotate(25)"/>
+    <ellipse cx="0" cy="-30" rx="26" ry="20" fill="url(#orchidPetal)"/>
+    <ellipse cx="-18" cy="24" rx="24" ry="18" fill="#7E22CE"/>
+    <ellipse cx="18" cy="24" rx="24" ry="18" fill="#7E22CE"/>
+    <circle cx="0" cy="6" r="10" fill="#FACC15"/>
+    <circle cx="0" cy="6" r="4" fill="#E11D48"/>
+  </g>
+  <!-- Top Bud -->
+  <circle cx="230" cy="65" r="9" fill="#84CC16"/>
+  <circle cx="238" cy="55" r="6" fill="#A855F7"/>
+  <text x="200" y="280" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="bold" fill="#6B21A8" text-anchor="middle" letter-spacing="1">ROYAL PURPLE ORCHIDS</text>
+</svg>

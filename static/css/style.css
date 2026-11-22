@@ -1,0 +1,515 @@
+/* ==========================================================================
+   Floral Bliss - Flower Shop Management System
+   Theme: Soft Sage Green, White, and Rose Accents
+   ========================================================================== */
+
+:root {
+  --primary-sage: #52796F;
+  --primary-sage-dark: #354F52;
+  --primary-sage-light: #84A98C;
+  --sage-bg-subtle: #CAD2C5;
+  --sage-bg-light: #F4F7F4;
+  --rose-accent: #E58C8A;
+  --rose-accent-dark: #D65A6E;
+  --rose-subtle: #FFF0F2;
+  --cream-white: #FCFCFA;
+  --card-bg: #FFFFFF;
+  --text-dark: #203A2B;
+  --text-muted: #6B7C72;
+  --border-color: #E2E8E4;
+  --warning-amber: #D97706;
+  --danger-crimson: #DC2626;
+  --success-emerald: #10B981;
+  --shadow-sm: 0 2px 6px rgba(40, 60, 48, 0.06);
+  --shadow-md: 0 8px 20px rgba(40, 60, 48, 0.08);
+  --shadow-lg: 0 14px 34px rgba(40, 60, 48, 0.12);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  color: var(--text-dark);
+  background-color: var(--sage-bg-light);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4, .brand-font {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  color: var(--primary-sage-dark);
+}
+
+/* ---------------- Navbar Styling ---------------- */
+.navbar-custom {
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+}
+
+.navbar-brand img {
+  height: 42px;
+}
+
+.nav-link {
+  color: var(--text-dark) !important;
+  font-weight: 500;
+  padding: 0.5rem 0.9rem !important;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--primary-sage-dark) !important;
+  background-color: var(--rose-subtle);
+}
+
+.role-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.role-badge.admin { background-color: #FEE2E2; color: #991B1B; }
+.role-badge.staff { background-color: #FEF3C7; color: #92400E; }
+.role-badge.delivery { background-color: #E0E7FF; color: #3730A3; }
+.role-badge.customer { background-color: #D1FAE5; color: #065F46; }
+
+/* ---------------- Hero Section ---------------- */
+.hero-section {
+  background: linear-gradient(135deg, #EBF3ED 0%, #FFF5F6 100%);
+  padding: 5rem 0 4rem;
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(229,140,138,0.2) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.hero-title {
+  font-size: 3.2rem;
+  line-height: 1.15;
+  color: var(--primary-sage-dark);
+}
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  max-width: 540px;
+}
+
+/* ---------------- Cards & Catalog ---------------- */
+.flower-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.flower-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-sage-light);
+}
+
+.flower-img-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 70%;
+  background: #FAFAFA;
+  overflow: hidden;
+}
+
+.flower-img-wrapper img, .flower-img-wrapper svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.flower-card:hover .flower-img-wrapper img,
+.flower-card:hover .flower-img-wrapper svg {
+  transform: scale(1.04);
+}
+
+.flower-badge-overlay {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  z-index: 2;
+}
+
+.badge-stock {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+.in-stock { background: rgba(16, 185, 129, 0.9); color: #fff; }
+.low-stock { background: rgba(217, 119, 6, 0.9); color: #fff; }
+.out-of-stock { background: rgba(220, 38, 38, 0.9); color: #fff; }
+
+.flower-details {
+  padding: 1.25rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.flower-category {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--primary-sage);
+  margin-bottom: 0.35rem;
+}
+
+.flower-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--primary-sage-dark);
+}
+
+.flower-price {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--rose-accent-dark);
+}
+
+/* ---------------- Buttons ---------------- */
+.btn-sage {
+  background-color: var(--primary-sage);
+  color: #fff;
+  border: 1px solid var(--primary-sage);
+  font-weight: 600;
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.btn-sage:hover {
+  background-color: var(--primary-sage-dark);
+  color: #fff;
+  border-color: var(--primary-sage-dark);
+  box-shadow: 0 4px 12px rgba(82, 121, 111, 0.3);
+}
+
+.btn-rose {
+  background-color: var(--rose-accent);
+  color: #fff;
+  border: 1px solid var(--rose-accent);
+  font-weight: 600;
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.btn-rose:hover {
+  background-color: var(--rose-accent-dark);
+  color: #fff;
+  border-color: var(--rose-accent-dark);
+  box-shadow: 0 4px 12px rgba(214, 90, 110, 0.3);
+}
+
+.btn-outline-sage {
+  background-color: transparent;
+  color: var(--primary-sage-dark);
+  border: 1.5px solid var(--primary-sage);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+}
+
+.btn-outline-sage:hover {
+  background-color: var(--primary-sage);
+  color: #fff;
+}
+
+/* ---------------- Demo Credentials Box ---------------- */
+.demo-box {
+  background: linear-gradient(135deg, #F3F8F5 0%, #FFF5F6 100%);
+  border: 1.5px dashed var(--primary-sage-light);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.demo-chip {
+  cursor: pointer;
+  background: #FFFFFF;
+  border: 1px solid var(--border-color);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.demo-chip:hover {
+  border-color: var(--primary-sage);
+  background-color: var(--sage-bg-subtle);
+  transform: translateY(-2px);
+}
+
+/* ---------------- Cart & Checkout ---------------- */
+.cart-item-card {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.qty-control {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 130px;
+}
+
+.qty-btn {
+  background: var(--sage-bg-light);
+  border: none;
+  width: 38px;
+  height: 38px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.qty-btn:hover {
+  background: var(--sage-bg-subtle);
+}
+
+.qty-input {
+  border: none;
+  text-align: center;
+  width: 50px;
+  font-weight: 600;
+  outline: none;
+}
+
+.order-summary-box {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------------- Tracking Pipeline ---------------- */
+.tracking-pipeline {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: 2.5rem 0 3rem;
+}
+
+.tracking-pipeline::before {
+  content: "";
+  position: absolute;
+  top: 24px;
+  left: 30px;
+  right: 30px;
+  height: 4px;
+  background: #E2E8F0;
+  z-index: 1;
+}
+
+.tracking-pipeline .pipeline-progress {
+  position: absolute;
+  top: 24px;
+  left: 30px;
+  height: 4px;
+  background: var(--primary-sage);
+  z-index: 1;
+  transition: width 0.4s ease;
+}
+
+.tracking-step {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  width: 120px;
+}
+
+.step-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #CBD5E1;
+  margin: 0 auto 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: #94A3B8;
+  transition: all 0.3s ease;
+}
+
+.tracking-step.completed .step-circle {
+  background: var(--primary-sage);
+  border-color: var(--primary-sage);
+  color: #fff;
+}
+
+.tracking-step.active .step-circle {
+  background: #fff;
+  border-color: var(--rose-accent-dark);
+  color: var(--rose-accent-dark);
+  box-shadow: 0 0 0 5px rgba(214, 90, 110, 0.2);
+  animation: pulse 1.8s infinite;
+}
+
+.step-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.tracking-step.completed .step-label,
+.tracking-step.active .step-label {
+  color: var(--primary-sage-dark);
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* ---------------- Printable Invoice ---------------- */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-invoice, #printable-invoice * {
+    visibility: visible;
+  }
+  #printable-invoice {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+    background: #fff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+.invoice-container {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-sm);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* ---------------- Table & Form Enhancements ---------------- */
+.table-custom {
+  background: #fff;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.table-custom th {
+  background-color: #F8FAF8;
+  color: var(--primary-sage-dark);
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-color);
+  padding: 0.85rem 1rem;
+}
+
+.table-custom td {
+  padding: 0.85rem 1rem;
+  vertical-align: middle;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.status-pill.order-placed { background: #FEF3C7; color: #92400E; }
+.status-pill.payment-confirmed { background: #DBEAFE; color: #1E40AF; }
+.status-pill.preparing { background: #E0E7FF; color: #3730A3; }
+.status-pill.out-for-delivery { background: #FDE68A; color: #78350F; }
+.status-pill.delivered { background: #D1FAE5; color: #065F46; }
+.status-pill.cancelled { background: #FEE2E2; color: #991B1B; }
+
+/* ---------------- Footer ---------------- */
+.footer-custom {
+  background-color: var(--primary-sage-dark);
+  color: #E2E8E4;
+  margin-top: auto;
+  padding: 3rem 0 1.5rem;
+}
+
+.footer-custom h5 {
+  color: #FFFFFF;
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.footer-link {
+  color: #CAD2C5;
+  text-decoration: none;
+  transition: color 0.2s;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.footer-link:hover {
+  color: var(--rose-accent);
+}

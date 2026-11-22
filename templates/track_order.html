@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Track Order #{{ order.order_id }} - Floral Bliss{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="display-6 fw-bold mb-1">
+        <i class="bi bi-clock-history me-2 text-primary"></i>Live Order Tracker
+      </h2>
+      <p class="text-muted small mb-0">Real-time status updates from our florists and delivery personnel.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('printable_invoice', order_id=order.order_id) }}" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+        <i class="bi bi-printer me-1"></i> Invoice
+      </a>
+      {% if current_user.type == 'customer' %}
+        <a href="{{ url_for('customer_dashboard') }}" class="btn btn-outline-sage btn-sm rounded-pill px-3">
+          <i class="bi bi-person me-1"></i> My Orders
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white mb-4">
+    
+    <!-- Order Summary Bar -->
+    <div class="row g-3 align-items-center pb-4 border-bottom">
+      <div class="col-md-3">
+        <span class="text-muted small d-block">Order Reference:</span>
+        <h5 class="fw-bold mb-0 text-dark">#{{ order.order_id }}</h5>
+      </div>
+      <div class="col-md-3">
+        <span class="text-muted small d-block">Customer:</span>
+        <h6 class="fw-bold mb-0">{{ order.customer_name }}</h6>
+      </div>
+      <div class="col-md-3">
+        <span class="text-muted small d-block">Delivery Date:</span>
+        <h6 class="fw-bold mb-0">{{ order.delivery_date or 'Today' }}</h6>
+      </div>
+      <div class="col-md-3 text-md-end">
+        <span class="text-muted small d-block">Current Status:</span>
+        <span class="status-pill {{ order.status.lower().replace(' ', '-') }} fs-6">
+          {{ order.status }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Visual Status Timeline Progress Bar -->
+    {% if order.status == 'Cancelled' %}
+      <div class="alert alert-danger my-5 p-4 rounded-3 text-center">
+        <i class="bi bi-x-circle-fill fs-1 d-block mb-2 text-danger"></i>
+        <h4 class="fw-bold">This Order Has Been Cancelled</h4>
+        <p class="small mb-0">Any online payments made have been refunded to the source account.</p>
+      </div>
+    {% else %}
+      {% set steps = ['Order Placed', 'Payment Confirmed', 'Preparing', 'Out for Delivery', 'Delivered'] %}
+      {% set status_index = 0 %}
+      {% if order.status == 'Order Placed' %}{% set status_index = 0 %}
+      {% elif order.status == 'Payment Confirmed' %}{% set status_index = 1 %}
+      {% elif order.status == 'Preparing' %}{% set status_index = 2 %}
+      {% elif order.status == 'Out for Delivery' %}{% set status_index = 3 %}
+      {% elif order.status == 'Delivered' %}{% set status_index = 4 %}
+      {% endif %}
+
+      <div class="tracking-pipeline my-5">
+        <div class="pipeline-progress" style="width: {{ (status_index / 4) * 100 }}%;"></div>
+
+        <!-- 1. Order Placed -->
+        <div class="tracking-step {% if status_index > 0 %}completed{% elif status_index == 0 %}active{% endif %}">
+          <div class="step-circle">
+            <i class="bi {% if status_index > 0 %}bi-check-lg{% else %}bi-receipt{% endif %}"></i>
+          </div>
+          <div class="step-label">Order Placed</div>
+        </div>
+
+        <!-- 2. Payment Confirmed -->
+        <div class="tracking-step {% if status_index > 1 %}completed{% elif status_index == 1 %}active{% endif %}">
+          <div class="step-circle">
+            <i class="bi {% if status_index > 1 %}bi-check-lg{% else %}bi-credit-card{% endif %}"></i>
+          </div>
+          <div class="step-label">Payment Confirmed</div>
+        </div>
+
+        <!-- 3. Preparing -->
+        <div class="tracking-step {% if status_index > 2 %}completed{% elif status_index == 2 %}active{% endif %}">
+          <div class="step-circle">
+            <i class="bi {% if status_index > 2 %}bi-check-lg{% else %}bi-flower1{% endif %}"></i>
+          </div>
+          <div class="step-label">Preparing Bouquet</div>
+        </div>
+
+        <!-- 4. Out for Delivery -->
+        <div class="tracking-step {% if status_index > 3 %}completed{% elif status_index == 3 %}active{% endif %}">
+          <div class="step-circle">
+            <i class="bi {% if status_index > 3 %}bi-check-lg{% else %}bi-bicycle{% endif %}"></i>
+          </div>
+          <div class="step-label">Out for Delivery</div>
+        </div>
+
+        <!-- 5. Delivered -->
+        <div class="tracking-step {% if status_index == 4 %}completed{% endif %}">
+          <div class="step-circle">
+            <i class="bi bi-box2-heart"></i>
+          </div>
+          <div class="step-label">Delivered</div>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Detailed Tracking Info Grid -->
+    <div class="row g-4 mt-2">
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded-3 border h-100">
+          <h6 class="fw-bold mb-2 text-dark"><i class="bi bi-geo-alt me-1 text-danger"></i> Destination & Instructions</h6>
+          <p class="mb-1 small"><strong>Address:</strong> {{ order.delivery_address or 'Store Pickup' }}</p>
+          <p class="mb-1 small"><strong>Contact:</strong> {{ order.phone }}</p>
+          <p class="mb-0 small text-muted"><strong>Recipient:</strong> {{ order.customer_name }}</p>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded-3 border h-100">
+          <h6 class="fw-bold mb-2 text-dark"><i class="bi bi-person-badge me-1 text-primary"></i> Delivery Personnel</h6>
+          {% if order.driver_name %}
+            <p class="mb-1 small"><strong>Assigned Driver:</strong> {{ order.driver_name }}</p>
+            <p class="mb-1 small"><strong>Status:</strong> <span class="badge bg-primary">{{ order.delivery_status }}</span></p>
+            <small class="text-success"><i class="bi bi-check-circle me-1"></i> Contact driver upon arrival</small>
+          {% else %}
+            <p class="small text-muted mb-0">Delivery personnel will be assigned once the bouquet is prepared by the florist.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Items in Order -->
+    <div class="mt-4 pt-3 border-top">
+      <h6 class="fw-bold mb-3">Order Flowers Summary</h6>
+      <div class="row g-3">
+        {% for item in items %}
+        <div class="col-md-6">
+          <div class="d-flex align-items-center gap-3 p-2 border rounded-3 bg-white">
+            <img src="{{ item.image_url }}" alt="{{ item.name }}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+            <div class="flex-grow-1">
+              <span class="fw-bold small d-block">{{ item.name }}</span>
+              <small class="text-muted">Quantity: {{ item.quantity }} | Unit: ₹{{ "%.2f"|format(item.unit_price) }}</small>
+            </div>
+            <span class="fw-bold text-dark small pe-2">₹{{ "%.2f"|format(item.quantity * item.unit_price) }}</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Cancel Order Option (Allowed if not yet Preparing) -->
+    {% if current_user.type == 'customer' and order.status in ['Order Placed', 'Payment Confirmed'] %}
+      <div class="mt-4 pt-3 border-top text-end">
+        <form action="{{ url_for('cancel_order', order_id=order.order_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order? Any payment will be refunded.');">
+          <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+            <i class="bi bi-x-circle me-1"></i> Cancel Order
+          </button>
+        </form>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

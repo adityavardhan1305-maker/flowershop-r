@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - Delivery & Payment | Floral Bliss{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('view_cart') }}" class="text-decoration-none">Cart</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+    </ol>
+  </nav>
+
+  <h2 class="display-6 fw-bold mb-4">Complete Your Floral Order</h2>
+
+  <form id="checkout-form" action="{{ url_for('checkout') }}" method="POST">
+    <!-- Hidden Payment outcome inputs -->
+    <input type="hidden" name="payment_status" id="payment-status-input" value="Paid">
+    <input type="hidden" name="transaction_id" id="transaction-id-input" value="">
+
+    <div class="row g-4">
+      
+      <!-- Left Column: Delivery & Schedule Details -->
+      <div class="col-lg-7">
+        
+        <!-- Recipient & Delivery Address Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+          <h5 class="fw-bold mb-3" style="color: var(--primary-sage-dark);">
+            <i class="bi bi-geo-alt-fill me-2 text-danger"></i> 1. Delivery Details
+          </h5>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-muted">Recipient Name</label>
+            <input type="text" class="form-control" value="{{ customer.name }}" readonly>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold text-muted">Contact Phone *</label>
+              <input type="tel" class="form-control" value="{{ customer.phone }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold text-muted">Recipient Email</label>
+              <input type="email" class="form-control" value="{{ customer.email }}" readonly>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-muted">Full Delivery Address *</label>
+            <textarea name="delivery_address" class="form-control" rows="3" required placeholder="Apartment / Villa, Street, Landmark, City, Pincode">{{ customer.address }}</textarea>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold text-muted">Delivery Date *</label>
+              <input type="date" name="delivery_date" class="form-control" min="{{ today_date }}" value="{{ today_date }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold text-muted">Preferred Delivery Slot *</label>
+              <select name="delivery_slot" class="form-select" required>
+                <option value="Morning (09:00 AM - 12:00 PM)">Morning (09:00 AM - 12:00 PM)</option>
+                <option value="Afternoon (12:00 PM - 04:00 PM)" selected>Afternoon (12:00 PM - 04:00 PM)</option>
+                <option value="Evening (04:00 PM - 08:00 PM)">Evening (04:00 PM - 08:00 PM)</option>
+                <option value="Express Midnight (11:30 PM - 12:00 AM)">Express Midnight (11:30 PM - 12:00 AM)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Method Selection Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+          <h5 class="fw-bold mb-3" style="color: var(--primary-sage-dark);">
+            <i class="bi bi-credit-card-2-front-fill me-2 text-success"></i> 2. Choose Payment Method
+          </h5>
+
+          <!-- Option 1: Mock Online Gateway (Razorpay/PayPal) -->
+          <div class="form-check p-3 border rounded-3 mb-3 bg-light">
+            <input class="form-check-input ms-0 me-3" type="radio" name="payment_method" id="pay-online" value="Razorpay / PayPal Mock" checked>
+            <label class="form-check-label d-block cursor-pointer" for="pay-online">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-bold">Online Payment Gateway (Simulating Razorpay & PayPal)</span>
+                <div>
+                  <span class="badge bg-primary me-1">UPI</span>
+                  <span class="badge bg-info text-dark me-1">Cards</span>
+                  <span class="badge bg-secondary">NetBanking</span>
+                </div>
+              </div>
+              <small class="text-muted d-block mt-1">
+                Opens interactive mock payment modal. Test with instant success or simulate failure!
+              </small>
+            </label>
+          </div>
+
+          <!-- Option 2: Cash on Delivery -->
+          <div class="form-check p-3 border rounded-3">
+            <input class="form-check-input ms-0 me-3" type="radio" name="payment_method" id="pay-cod" value="Cash on Delivery">
+            <label class="form-check-label d-block cursor-pointer" for="pay-cod">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-bold">Cash on Delivery (COD)</span>
+                <span class="badge bg-success">Pay upon arrival</span>
+              </div>
+              <small class="text-muted d-block mt-1">
+                Pay with cash or scan delivery agent's QR code upon flower handover.
+              </small>
+            </label>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Order Items & Live Calculation -->
+      <div class="col-lg-5">
+        <div class="order-summary-box shadow-sm sticky-top" style="top: 80px;">
+          <h5 class="fw-bold mb-3 border-bottom pb-2">Order Items ({{ cart_items|length }})</h5>
+
+          <div class="overflow-auto mb-3" style="max-height: 240px;">
+            {% for item in cart_items %}
+              <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+                <div class="d-flex align-items-center gap-2">
+                  <img src="{{ item.flower.image_url }}" alt="{{ item.flower.name }}" 
+                       class="rounded border" style="width: 48px; height: 48px; object-fit: cover;">
+                  <div>
+                    <h6 class="mb-0 fw-semibold text-dark small">{{ item.flower.name }}</h6>
+                    <small class="text-muted">{{ item.quantity }} × ₹{{ "%.2f"|format(item.flower.price) }}</small>
+                  </div>
+                </div>
+                <span class="fw-bold small">₹{{ "%.2f"|format(item.item_total) }}</span>
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Calculation Formula -->
+          <div class="d-flex justify-content-between mb-2 small">
+            <span class="text-muted">Subtotal:</span>
+            <span class="fw-semibold">₹{{ "%.2f"|format(subtotal) }}</span>
+          </div>
+
+          <div class="d-flex justify-content-between mb-2 small">
+            <span class="text-muted">Delivery Charge:</span>
+            <span class="fw-semibold">
+              {% if delivery_charge == 0 %}FREE{% else %}₹{{ "%.2f"|format(delivery_charge) }}{% endif %}
+            </span>
+          </div>
+
+          <div class="d-flex justify-content-between mb-3 small">
+            <span class="text-muted">Discount Applied:</span>
+            <span class="fw-bold text-danger">-₹{{ "%.2f"|format(discount) }}</span>
+          </div>
+
+          <hr>
+
+          <div class="d-flex justify-content-between align-items-baseline mb-4">
+            <span class="fs-5 fw-bold text-dark">Payable Amount:</span>
+            <span class="fs-3 fw-bold" id="checkout-total-display" style="color: var(--rose-accent-dark);">
+              ₹{{ "%.2f"|format(total_amount) }}
+            </span>
+          </div>
+
+          <button type="button" class="btn btn-sage btn-lg w-100 py-3 rounded-pill fw-bold shadow-sm" onclick="openPaymentModal()">
+            <i class="bi bi-lock-fill me-2"></i> Confirm & Proceed to Pay
+          </button>
+
+          <div class="text-center mt-3 small text-muted">
+            <i class="bi bi-shield-lock me-1"></i> 256-bit Encrypted Secure Checkout
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>
+
+<!-- ========================================================================= -->
+<!-- Mock Payment Gateway Modal (Simulating Razorpay / PayPal API) -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="mockPaymentModal" tabindex="-1" aria-labelledby="mockPaymentModalLabel" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      
+      <!-- Modal Header (Branded like Razorpay/PayPal) -->
+      <div class="p-3 text-white d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0C2340 0%, #1A365D 100%);">
+        <div class="d-flex align-items-center gap-2">
+          <span class="fs-4">🌸</span>
+          <div>
+            <h6 class="mb-0 fw-bold">Floral Bliss Boutique</h6>
+            <small class="text-white-50" style="font-size: 0.72rem;">Razorpay & PayPal Secure Sandbox</small>
+          </div>
+        </div>
+        <div class="text-end">
+          <span class="badge bg-success small">Test Mode</span>
+          <h5 class="mb-0 fw-bold mt-1" id="modal-pay-amount">₹0.00</h5>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body p-4">
+        
+        <!-- Interactive Payment Selection View -->
+        <div id="payment-modal-content">
+          <p class="text-muted small mb-3">Choose your simulated payment method to complete the order:</p>
+
+          <ul class="nav nav-pills nav-fill mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item">
+              <button class="nav-link active small py-2" data-bs-toggle="pill" data-bs-target="#pay-upi">
+                <i class="bi bi-qr-code me-1"></i> UPI / QR
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link small py-2" data-bs-toggle="pill" data-bs-target="#pay-card">
+                <i class="bi bi-credit-card me-1"></i> Card
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link small py-2" data-bs-toggle="pill" data-bs-target="#pay-net">
+                <i class="bi bi-bank me-1"></i> NetBanking
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content border rounded-3 p-3 bg-light mb-4">
+            <!-- UPI Tab -->
+            <div class="tab-pane fade show active text-center" id="pay-upi">
+              <div class="p-2 bg-white rounded border d-inline-block mb-2">
+                <i class="bi bi-qr-code fs-1 text-dark"></i>
+              </div>
+              <p class="small text-muted mb-1">Scan via Google Pay, PhonePe, or Paytm</p>
+              <span class="badge bg-secondary">floralbliss@okhdfcbank</span>
+            </div>
+
+            <!-- Card Tab -->
+            <div class="tab-pane fade" id="pay-card">
+              <div class="mb-2">
+                <input type="text" class="form-control form-control-sm" placeholder="Card Number: 4111 2222 3333 4444" value="4111 2222 3333 4444" readonly>
+              </div>
+              <div class="row g-2">
+                <div class="col-6"><input type="text" class="form-control form-control-sm" placeholder="MM/YY" value="12/28" readonly></div>
+                <div class="col-6"><input type="text" class="form-control form-control-sm" placeholder="CVV" value="888" readonly></div>
+              </div>
+            </div>
+
+            <!-- Net Banking Tab -->
+            <div class="tab-pane fade text-center" id="pay-net">
+              <p class="small text-muted mb-2">Select Sandbox Bank:</p>
+              <div class="d-flex justify-content-center gap-2">
+                <span class="badge bg-white text-dark border p-2">HDFC Bank</span>
+                <span class="badge bg-white text-dark border p-2">ICICI Bank</span>
+                <span class="badge bg-white text-dark border p-2">SBI</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sandbox Simulation Controls (TC07 & TC08 Testing) -->
+          <div class="p-3 rounded-3 border bg-white mb-3">
+            <span class="small fw-bold text-uppercase d-block mb-2 text-muted" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+              <i class="bi bi-gear-fill me-1"></i> Sandbox Outcome Simulator:
+            </span>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-success btn-sm flex-grow-1" onclick="processMockTransaction('success')">
+                <i class="bi bi-check-circle me-1"></i> Simulate Success (TC07)
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm flex-grow-1" onclick="processMockTransaction('failure')">
+                <i class="bi bi-x-circle me-1"></i> Simulate Failure (TC08)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Processing Spinner -->
+        <div id="payment-processing-spinner" class="d-none text-center py-5">
+          <div class="spinner-border text-success" role="status" style="width: 3.5rem; height: 3.5rem;">
+            <span class="visually-hidden">Processing...</span>
+          </div>
+          <h5 class="fw-bold mt-3">Connecting to Gateway...</h5>
+          <p class="text-muted small">Simulating encrypted communication with bank authorization server...</p>
+        </div>
+
+        <!-- Success Animation Box -->
+        <div id="payment-success-box" class="d-none text-center py-4">
+          <div class="text-success fs-1 mb-2">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+          <h5 class="fw-bold text-success">Payment Authorized!</h5>
+          <p class="text-muted small">Generating confirmed order and forwarding to florist...</p>
+        </div>
+
+        <!-- Failure Simulation Box (TC08) -->
+        <div id="payment-failure-box" class="d-none text-center py-4">
+          <div class="text-danger fs-1 mb-2">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+          </div>
+          <h5 class="fw-bold text-danger">Payment Authorization Failed</h5>
+          <p class="text-muted small">Gateway Error: Bank declined transaction or timeout. Your card was not charged.</p>
+          <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="resetPaymentModal()">
+            <i class="bi bi-arrow-counterclockwise me-1"></i> Try Again
+          </button>
+        </div>
+
+      </div>
+
+      <div class="modal-footer bg-light border-0 py-2">
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" onclick="resetPaymentModal()">Cancel</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/payment-modal.js') }}"></script>
+{% endblock %}

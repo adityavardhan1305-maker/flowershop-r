@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Administrator Dashboard - Floral Bliss{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  
+  <!-- Admin Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+      <span class="badge bg-danger-subtle text-danger px-3 py-1 rounded-pill fw-semibold border mb-1">
+        <i class="bi bi-shield-lock-fill me-1"></i> System Administration
+      </span>
+      <h2 class="display-6 fw-bold mb-0">Flower Shop Analytics & Operations</h2>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('admin_reports') }}" class="btn btn-outline-sage btn-sm rounded-pill px-3">
+        <i class="bi bi-file-earmark-bar-graph me-1"></i> View Reports
+      </a>
+      <a href="{{ url_for('admin_flowers') }}" class="btn btn-sage btn-sm rounded-pill px-3">
+        <i class="bi bi-plus-circle me-1"></i> Manage Flowers
+      </a>
+    </div>
+  </div>
+
+  <!-- Summary Analytics Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white border-start border-4 border-success">
+        <span class="text-muted small text-uppercase fw-semibold">Total Revenue (Paid)</span>
+        <h3 class="fw-bold my-1 text-success">₹{{ "%.2f"|format(total_revenue) }}</h3>
+        <small class="text-muted">From confirmed payments</small>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white border-start border-4 border-primary">
+        <span class="text-muted small text-uppercase fw-semibold">Total Orders Placed</span>
+        <h3 class="fw-bold my-1 text-dark">{{ total_orders }}</h3>
+        <small class="text-muted">Across all channels</small>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white border-start border-4 border-warning">
+        <span class="text-muted small text-uppercase fw-semibold">Low Stock Warnings</span>
+        <h3 class="fw-bold my-1 text-warning">{{ low_stock_count }}</h3>
+        <small class="text-muted">&le; 5 units remaining</small>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white border-start border-4 border-info">
+        <span class="text-muted small text-uppercase fw-semibold">Registered Customers</span>
+        <h3 class="fw-bold my-1 text-dark">{{ total_customers }}</h3>
+        <small class="text-muted">Active client base</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+        <h5 class="fw-bold mb-3" style="color: var(--primary-sage-dark);">
+          <i class="bi bi-graph-up me-2 text-primary"></i> Top Selling Flowers (Sales Volume)
+        </h5>
+        <div style="height: 280px;">
+          <canvas id="topFlowersChart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+        <h5 class="fw-bold mb-3" style="color: var(--primary-sage-dark);">
+          <i class="bi bi-pie-chart me-2 text-warning"></i> Order Status Distribution
+        </h5>
+        <div style="height: 280px;">
+          <canvas id="orderStatusChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Orders Table -->
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white mb-4">
+    <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+      <h5 class="fw-bold m-0" style="color: var(--primary-sage-dark);">
+        <i class="bi bi-receipt me-2"></i> Recent Customer Orders
+      </h5>
+      <a href="{{ url_for('admin_deliveries') }}" class="btn btn-outline-sage btn-sm rounded-pill">
+        Assign Drivers & Deliveries &rarr;
+      </a>
+    </div>
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th scope="col" class="ps-4">Order ID</th>
+            <th scope="col">Customer</th>
+            <th scope="col">Date</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Payment</th>
+            <th scope="col">Status</th>
+            <th scope="col" class="text-end pe-4">Invoice</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ro in recent_orders %}
+          <tr>
+            <td class="ps-4"><strong>#{{ ro.order_id }}</strong></td>
+            <td>{{ ro.customer_name }}</td>
+            <td class="small">{{ ro.order_date }}</td>
+            <td class="fw-bold">₹{{ "%.2f"|format(ro.total_amount) }}</td>
+            <td>
+              <span class="badge {% if ro.payment_status == 'Paid' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                {{ ro.payment_status }}
+              </span>
+            </td>
+            <td>
+              <span class="status-pill {{ ro.status.lower().replace(' ', '-') }}">
+                {{ ro.status }}
+              </span>
+            </td>
+            <td class="text-end pe-4">
+              <a href="{{ url_for('printable_invoice', order_id=ro.order_id) }}" target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill">
+                <i class="bi bi-printer"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // 1. Top Selling Flowers Bar Chart
+  const topFlowerLabels = [{% for f in top_flowers %}"{{ f.name }}",{% endfor %}];
+  const topFlowerData = [{% for f in top_flowers %}{{ f.sold_qty }},{% endfor %}];
+
+  const ctxTop = document.getElementById('topFlowersChart').getContext('2d');
+  new Chart(ctxTop, {
+    type: 'bar',
+    data: {
+      labels: topFlowerLabels.length ? topFlowerLabels : ["Velvet Red Roses", "Royal Purple Orchid", "Pastel Pink Carnation", "Pure White Lilies"],
+      datasets: [{
+        label: 'Units Sold',
+        data: topFlowerData.length ? topFlowerData : [18, 12, 10, 6],
+        backgroundColor: '#52796F',
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true, ticks: { precision: 0 } }
+      }
+    }
+  });
+
+  // 2. Order Status Doughnut Chart
+  const statusLabels = [{% for s in status_counts %}"{{ s.status }}",{% endfor %}];
+  const statusValues = [{% for s in status_counts %}{{ s.count }},{% endfor %}];
+
+  const ctxStatus = document.getElementById('orderStatusChart').getContext('2d');
+  new Chart(ctxStatus, {
+    type: 'doughnut',
+    data: {
+      labels: statusLabels.length ? statusLabels : ['Order Placed', 'Payment Confirmed', 'Preparing', 'Out for Delivery', 'Delivered'],
+      datasets: [{
+        data: statusValues.length ? statusValues : [1, 1, 1, 1, 1],
+        backgroundColor: ['#F59E0B', '#3B82F6', '#8B5CF6', '#F97316', '#10B981', '#EF4444']
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}{{ flower.name }} - Floral Bliss{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('catalog') }}" class="text-decoration-none">Flower Catalog</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ flower.name }}</li>
+    </ol>
+  </nav>
+
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white mb-5">
+    <div class="row g-0">
+      <div class="col-lg-6 bg-light d-flex align-items-center justify-content-center p-4">
+        <img src="{{ flower.image_url }}" alt="{{ flower.name }}" class="img-fluid rounded-4 shadow-sm" style="max-height: 420px; object-fit: contain;">
+      </div>
+
+      <div class="col-lg-6 p-4 p-md-5 d-flex flex-column">
+        <div class="mb-2">
+          <span class="badge bg-light text-success border px-3 py-1 rounded-pill fw-semibold">{{ flower.category_name }}</span>
+          <span class="badge bg-light text-secondary border px-3 py-1 rounded-pill ms-1">{{ flower.color }} Bloom</span>
+        </div>
+
+        <h2 class="display-6 fw-bold mb-2">{{ flower.name }}</h2>
+        <p class="text-muted small mb-3">Supplied with love by <strong>{{ flower.supplier_name or 'Premium Partner Farms' }}</strong></p>
+
+        <div class="d-flex align-items-baseline gap-3 mb-4">
+          <span class="display-6 fw-bold" style="color: var(--rose-accent-dark);">₹{{ "%.2f"|format(flower.price) }}</span>
+          <span class="text-muted small">Inclusive of all taxes</span>
+        </div>
+
+        <div class="mb-4">
+          <h6 class="fw-bold mb-2">Availability:</h6>
+          {% if flower.stock_qty <= 0 %}
+            <span class="badge bg-danger px-3 py-2 fs-6"><i class="bi bi-x-circle me-1"></i> Out of Stock</span>
+            <p class="text-danger small mt-2">Currently unavailable. Check back soon when fresh stock arrives.</p>
+          {% elif flower.stock_qty <= 5 %}
+            <span class="badge bg-warning text-dark px-3 py-2 fs-6"><i class="bi bi-exclamation-triangle me-1"></i> Low Stock: Only {{ flower.stock_qty }} Units Remaining!</span>
+          {% else %}
+            <span class="badge bg-success px-3 py-2 fs-6"><i class="bi bi-check2-circle me-1"></i> In Stock ({{ flower.stock_qty }} Available)</span>
+          {% endif %}
+        </div>
+
+        <!-- Add to cart or Buy Now Form -->
+        {% if flower.stock_qty > 0 %}
+          <form action="{{ url_for('add_to_cart') }}" method="POST" class="mb-4">
+            <input type="hidden" name="flower_id" value="{{ flower.flower_id }}">
+            <div class="d-flex flex-wrap gap-3 align-items-center mb-3">
+              <label class="fw-semibold">Quantity:</label>
+              <div class="qty-control">
+                <button type="button" class="qty-btn" onclick="let input=this.nextElementSibling; if(parseInt(input.value)>1) input.value=parseInt(input.value)-1;">-</button>
+                <input type="number" name="quantity" class="qty-input" value="1" min="1" max="{{ flower.stock_qty }}" readonly>
+                <button type="button" class="qty-btn" onclick="let input=this.previousElementSibling; if(parseInt(input.value)<{{ flower.stock_qty }}) input.value=parseInt(input.value)+1; else alert('Cannot exceed available stock of {{ flower.stock_qty }}!');">+</button>
+              </div>
+            </div>
+
+            <div class="d-flex gap-3">
+              <button type="submit" class="btn btn-sage btn-lg px-4 flex-grow-1">
+                <i class="bi bi-cart-plus me-2"></i> Add to Cart
+              </button>
+              <button type="submit" name="buy_now" value="true" class="btn btn-rose btn-lg px-4 flex-grow-1">
+                <i class="bi bi-lightning-charge me-1"></i> Buy Now
+              </button>
+            </div>
+          </form>
+        {% else %}
+          <div class="alert alert-secondary mb-4">
+            <i class="bi bi-info-circle me-2"></i> This flower is currently sold out. Please explore our other bouquets!
+          </div>
+        {% endif %}
+
+        <!-- Care Tips -->
+        <div class="p-3 rounded-3 bg-light border mt-auto">
+          <h6 class="fw-bold mb-2 small text-uppercase" style="color: var(--primary-sage-dark);"><i class="bi bi-droplet-half me-1"></i> Florist Fresh Care Tips</h6>
+          <ul class="text-muted small mb-0 ps-3">
+            <li>Trim stems diagonally by 1-2 cm under running lukewarm water.</li>
+            <li>Place in clean vase with fresh water; refresh water every 2 days.</li>
+            <li>Keep away from direct blazing sunlight, heating vents, and ripening fruit.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related Flowers -->
+  {% if related_flowers %}
+  <div class="mt-5">
+    <h4 class="fw-bold mb-4">You May Also Like</h4>
+    <div class="row g-4">
+      {% for rel in related_flowers %}
+      <div class="col-md-4">
+        <div class="flower-card">
+          <div class="flower-img-wrapper">
+            <img src="{{ rel.image_url }}" alt="{{ rel.name }}">
+          </div>
+          <div class="flower-details">
+            <h6 class="fw-bold">{{ rel.name }}</h6>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <span class="flower-price fs-6">₹{{ "%.2f"|format(rel.price) }}</span>
+              <a href="{{ url_for('flower_detail', flower_id=rel.flower_id) }}" class="btn btn-sm btn-outline-sage">View</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

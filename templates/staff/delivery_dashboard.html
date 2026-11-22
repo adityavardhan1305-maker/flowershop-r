@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Delivery Dashboard - Floral Bliss{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+      <span class="badge bg-primary-subtle text-primary-emphasis px-3 py-1 rounded-pill fw-semibold border mb-1">
+        <i class="bi bi-bicycle me-1"></i> Delivery Personnel Portal
+      </span>
+      <h2 class="display-6 fw-bold mb-0">Assigned Flower Deliveries</h2>
+    </div>
+    <div class="text-muted small">
+      Logged in as: <strong>{{ current_user.name }}</strong>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+    <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+      <h5 class="fw-bold m-0" style="color: var(--primary-sage-dark);">
+        <i class="bi bi-box-seam me-2 text-primary"></i> Delivery Tasks Queue ({{ deliveries|length }})
+      </h5>
+    </div>
+
+    {% if not deliveries %}
+      <div class="text-center py-5">
+        <span class="fs-1">🚲</span>
+        <h5 class="fw-bold mt-2">No Deliveries Assigned</h5>
+        <p class="text-muted small">Check back when the florist finishes preparing new customer orders.</p>
+      </div>
+    {% else %}
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col" class="ps-4">Delivery #</th>
+              <th scope="col">Order ID</th>
+              <th scope="col">Customer Info</th>
+              <th scope="col" style="max-width: 250px;">Destination Address</th>
+              <th scope="col">Payment Mode</th>
+              <th scope="col">Delivery Status</th>
+              <th scope="col" class="text-end pe-4">Update Delivery</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in deliveries %}
+            <tr>
+              <td class="ps-4">
+                <strong>#{{ d.delivery_id }}</strong>
+              </td>
+              <td>
+                <a href="{{ url_for('track_order', order_id=d.order_id) }}" target="_blank" class="fw-bold text-decoration-none">
+                  #{{ d.order_id }} <i class="bi bi-box-arrow-up-right small"></i>
+                </a>
+              </td>
+              <td>
+                <span class="fw-bold text-dark d-block">{{ d.customer_name }}</span>
+                <a href="tel:{{ d.customer_phone }}" class="text-decoration-none small text-primary">
+                  <i class="bi bi-telephone me-1"></i> {{ d.customer_phone }}
+                </a>
+              </td>
+              <td style="max-width: 250px;">
+                <small class="text-muted d-block">{{ d.address }}</small>
+              </td>
+              <td>
+                <span class="badge {% if d.payment_status == 'Paid' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                  {{ d.payment_method }} ({{ d.payment_status }})
+                </span>
+                <small class="d-block text-dark fw-bold mt-1">₹{{ "%.2f"|format(d.total_amount) }}</small>
+              </td>
+              <td>
+                <span class="status-pill {{ d.status.lower().replace(' ', '-') }}">
+                  {{ d.status }}
+                </span>
+                {% if d.delivered_on %}
+                  <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Delivered: {{ d.delivered_on }}</small>
+                {% endif %}
+              </td>
+              <td class="text-end pe-4">
+                <form action="{{ url_for('update_delivery_status', delivery_id=d.delivery_id) }}" method="POST" class="d-inline-flex gap-2">
+                  {% if d.status == 'Assigned' %}
+                    <input type="hidden" name="status" value="Out for Delivery">
+                    <button type="submit" class="btn btn-sm btn-warning rounded-pill px-3 text-dark">
+                      <i class="bi bi-bicycle me-1"></i> Start Delivery
+                    </button>
+                  {% elif d.status == 'Out for Delivery' %}
+                    <input type="hidden" name="status" value="Delivered">
+                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
+                      <i class="bi bi-check2-circle me-1"></i> Mark Delivered
+                    </button>
+                  {% else %}
+                    <span class="text-success small fw-semibold"><i class="bi bi-check-all fs-5"></i> Completed</span>
+                  {% endif %}
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

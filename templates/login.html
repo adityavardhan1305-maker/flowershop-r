@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In or Register - Floral Bliss{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+      
+      <!-- Instant 1-Click Demo Credentials Card -->
+      <div class="demo-box shadow-sm mb-4">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h6 class="fw-bold m-0" style="color: var(--primary-sage-dark);">
+            <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Instant 1-Click Demo Accounts
+          </h6>
+          <span class="badge bg-white text-muted border small">Click any chip to auto-fill</span>
+        </div>
+        <p class="text-muted small mb-3">
+          Select any role below to pre-fill credentials for immediate system testing:
+        </p>
+
+        <div class="row g-2">
+          <div class="col-6 col-md-3">
+            <button type="button" class="btn btn-sm btn-outline-danger w-100 demo-fill-btn py-2 text-start"
+                    data-email="admin@flowershop.com" data-password="password123" data-role="Admin">
+              <div class="fw-bold"><i class="bi bi-shield-lock-fill me-1"></i> Admin</div>
+              <small class="text-muted" style="font-size: 0.7rem;">admin@flowershop.com</small>
+            </button>
+          </div>
+          <div class="col-6 col-md-3">
+            <button type="button" class="btn btn-sm btn-outline-warning w-100 demo-fill-btn py-2 text-start"
+                    data-email="florist@flowershop.com" data-password="password123" data-role="Staff">
+              <div class="fw-bold"><i class="bi bi-flower1 me-1"></i> Florist</div>
+              <small class="text-muted" style="font-size: 0.7rem;">florist@flowershop.com</small>
+            </button>
+          </div>
+          <div class="col-6 col-md-3">
+            <button type="button" class="btn btn-sm btn-outline-primary w-100 demo-fill-btn py-2 text-start"
+                    data-email="delivery@flowershop.com" data-password="password123" data-role="Delivery">
+              <div class="fw-bold"><i class="bi bi-bicycle me-1"></i> Delivery</div>
+              <small class="text-muted" style="font-size: 0.7rem;">delivery@flowershop.com</small>
+            </button>
+          </div>
+          <div class="col-6 col-md-3">
+            <button type="button" class="btn btn-sm btn-outline-success w-100 demo-fill-btn py-2 text-start"
+                    data-email="customer@flowershop.com" data-password="password123" data-role="Customer">
+              <div class="fw-bold"><i class="bi bi-person-heart me-1"></i> Customer</div>
+              <small class="text-muted" style="font-size: 0.7rem;">customer@flowershop.com</small>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Login / Register Card -->
+      <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
+        <!-- Tabs Header -->
+        <ul class="nav nav-tabs nav-fill bg-light border-bottom" id="authTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active py-3 fw-bold" id="login-tab" data-bs-toggle="tab" data-bs-target="#login-panel" type="button" role="tab" aria-controls="login-panel" aria-selected="true">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Sign In (All Roles)
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link py-3 fw-bold" id="register-tab" data-bs-toggle="tab" data-bs-target="#register-panel" type="button" role="tab" aria-controls="register-panel" aria-selected="false">
+              <i class="bi bi-person-plus me-1"></i> New Customer Registration
+            </button>
+          </li>
+        </ul>
+
+        <div class="card-body p-4 p-md-5">
+          <div class="tab-content" id="authTabContent">
+            
+            <!-- 1. Sign In Panel -->
+            <div class="tab-pane fade show active" id="login-panel" role="tabpanel" aria-labelledby="login-tab">
+              <div class="text-center mb-4">
+                <span class="fs-1">🌸</span>
+                <h4 class="fw-bold mt-2">Welcome to Floral Bliss</h4>
+                <p class="text-muted small">Sign in to manage orders, stock, deliveries, or shop for fresh flowers.</p>
+              </div>
+
+              <form action="{{ url_for('login') }}" method="POST">
+                <input type="hidden" name="next" value="{{ next }}">
+
+                <div class="mb-3">
+                  <label class="form-label fw-semibold small text-muted">Email Address</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                    <input type="email" name="email" id="login-email" class="form-control" placeholder="name@example.com" required>
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <div class="d-flex justify-content-between">
+                    <label class="form-label fw-semibold small text-muted">Password</label>
+                    <span class="small text-muted">Default: <code>password123</code></span>
+                  </div>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                    <input type="password" name="password" id="login-password" class="form-control" placeholder="Enter password" required>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-sage w-100 py-2 fs-6 fw-bold shadow-sm">
+                  <i class="bi bi-box-arrow-in-right me-2"></i> Log In
+                </button>
+              </form>
+
+              <div class="mt-4 text-center">
+                <small class="text-muted">
+                  Role-based redirection takes you directly to your tailored dashboard (Customer, Florist, Delivery, or Admin).
+                </small>
+              </div>
+            </div>
+
+            <!-- 2. Customer Registration Panel -->
+            <div class="tab-pane fade" id="register-panel" role="tabpanel" aria-labelledby="register-tab">
+              <div class="text-center mb-4">
+                <span class="fs-1">💐</span>
+                <h4 class="fw-bold mt-2">Create Customer Account</h4>
+                <p class="text-muted small">Join us to save favorite bouquets, track orders live, and receive exclusive floral discounts.</p>
+              </div>
+
+              <form action="{{ url_for('register') }}" method="POST">
+                <div class="mb-3">
+                  <label class="form-label fw-semibold small text-muted">Full Name *</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                    <input type="text" name="name" class="form-control" placeholder="e.g. Ananya Sharma" required>
+                  </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label fw-semibold small text-muted">Email Address *</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                      <input type="email" name="email" class="form-control" placeholder="ananya@example.com" required>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-semibold small text-muted">Phone Number</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="bi bi-phone"></i></span>
+                      <input type="tel" name="phone" class="form-control" placeholder="+91 98765 43210">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label fw-semibold small text-muted">Password *</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                    <input type="password" name="password" class="form-control" placeholder="Create a secure password" required minlength="4">
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label fw-semibold small text-muted">Delivery Address</label>
+                  <textarea name="address" class="form-control" rows="2" placeholder="House/Flat No, Street, Landmark, City, Pincode"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-rose w-100 py-2 fs-6 fw-bold shadow-sm">
+                  <i class="bi bi-check-circle me-2"></i> Register & Start Shopping
+                </button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
